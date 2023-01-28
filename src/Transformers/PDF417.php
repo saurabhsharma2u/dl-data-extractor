@@ -24,11 +24,11 @@ class PDF417 extends AttributesPDF417
     {
         $pdf417Data = [];
         foreach ($this->Keys as $key => $item) {
-            $dl_string = str_replace($item['abbreviation'], ' ' . $item['abbreviation'], $this->pdf417);
+            $this->pdf417 = str_replace($item['abbreviation'], ' ' . $item['abbreviation'], $this->pdf417);
         }
-        $dl_string = str_replace('  ', ' ', $dl_string);
+        $dl_string = str_replace('  ', ' ', $this->pdf417);
         foreach ($this->Keys as $key => $item) {
-            $value = $this->getField(dl_string: $dl_string, keyword: $item['abbreviation']);
+            $value = $this->getField(dl_string: $this->pdf417, keyword: $item['abbreviation']);
             if (!empty(trim($value))) {
                 $pdf417Data[$item['description']]   = $value;
             }
