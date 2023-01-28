@@ -1,6 +1,6 @@
-# PDF417 Driving License Data Extractor
+# Driving License Data Extractor
 
-A simple class to return Driving License information, such as Driver First Name, Last Name, License Number etc.
+A simple class to return Driving License information, such as Driver First Name, Last Name, License Number etc. Currently only Support PDF417 BarCodes
 
 ## Installation
 
