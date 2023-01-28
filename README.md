@@ -1,4 +1,4 @@
-# Http Status Codes
+# PDF417 Driving License Data Extractor
 
 A simple class to return Driving License information, such as Driver First Name, Last Name, License Number etc.
 
