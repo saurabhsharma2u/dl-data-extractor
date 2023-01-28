@@ -1,0 +1,40 @@
+{
+  "name": "saurabhsharma/dl-data-extractor",
+  "description": "A simple class to return Driving License information, such as Driver First Name, Last Name, License Number etc.",
+  "type": "library",
+  "license": "MIT",
+  "keywords": [
+    "driving License data Extractor",
+    "pdf14 data extractor",
+    "DL parsing"
+  ],
+  "authors": [
+    {
+      "role": "Developer",
+      "name": "Saurabh Sharma",
+      "email": "saurabhsharma2u@gmail.com"
+    }
+  ],
+  "minimum-stability": "stable",
+  "autoload": {
+    "psr-4": {
+      "SaurabhSharma\\DLExtractor\\": "src/"
+    }
+  },
+  "autoload-dev": {
+    "psr-4": {
+      "SaurabhSharma\\Tests\\DLExtractor\\": "Tests/"
+    }
+  },
+  "require": {
+    "php": "^7.1 || ^7.2 || ^7.3 || ^7.4 || ^8.0 || ^8.1 || ^8.2"
+  },
+  "require-dev": {
+    "pestphp/pest": "^1.22"
+  },
+  "config": {
+    "allow-plugins": {
+      "pestphp/pest-plugin": true
+    }
+  }
+}
