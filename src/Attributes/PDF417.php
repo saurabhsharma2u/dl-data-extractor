@@ -305,10 +305,10 @@ class PDF417
             'abbreviation' => 'DDC',
             'description' => 'HazMat_Endorsement_Expiry_Date',
         ],
-        [
-            'abbreviation' => 'DDD',
-            'description' => 'Limited_Duration_Document_Indicator',
-        ],
+        // [
+        //     'abbreviation' => 'DDD',
+        //     'description' => 'Limited_Duration_Document_Indicator',
+        // ],
         [
             'abbreviation' => 'DDE',
             'description' => 'Family_Name_Truncation',
