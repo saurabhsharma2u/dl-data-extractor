@@ -102,10 +102,6 @@ class PDF417
             'description' => 'Height_in_FT_IN',
         ],
         [
-            'abbreviation' => 'DAV',
-            'description' => 'Height_in_CM',
-        ],
-        [
             'abbreviation' => 'DAW',
             'description' => 'Weight_in_LBS',
         ],
