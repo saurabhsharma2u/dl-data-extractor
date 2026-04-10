@@ -51,4 +51,3 @@ it('supports canonical only mode', function () {
 it('throws for unsupported formats', function () {
     DLExtractor::parse('DCSDOE', 'mrz');
 })->throws(UnsupportedTransformerException::class);
-})->skip();
