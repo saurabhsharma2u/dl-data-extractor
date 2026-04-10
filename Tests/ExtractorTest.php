@@ -9,9 +9,12 @@ it('returns response as array', function () {
     $result = DLExtractor::parse('DCSDOE DACJANE DAQ1234')->toArray();
 
     expect($result)->toBeArray()
-        ->and($result)->toHaveKey('Family_Name', 'DOE')
-        ->and($result)->toHaveKey('First_Name', 'JANE')
-        ->and($result)->toHaveKey('License_or_ID_Number', '1234');
+        ->toHaveKey('Family_Name')
+        ->toHaveKey('First_Name')
+        ->toHaveKey('License_or_ID_Number')
+        ->and($result['Family_Name'])->toBe('DOE')
+        ->and($result['First_Name'])->toBe('JANE')
+        ->and($result['License_or_ID_Number'])->toBe('1234');
 });
 
 it('returns response as json string', function () {
@@ -25,19 +28,24 @@ it('can parse actual PDF417 string to array', function () {
 
     expect($result)
         ->toBeArray()
-        ->toHaveKey('Family_Name', 'APARICIOVASQUEZ')
-        ->toHaveKey('Given_Name', 'MARIOANTONIO')
-        ->toHaveKey('License_or_ID_Number', 'B66150819');
+        ->toHaveKey('Family_Name')
+        ->toHaveKey('Given_Name')
+        ->toHaveKey('License_or_ID_Number')
+        ->and($result['Family_Name'])->toBe('APARICIOVASQUEZ')
+        ->and($result['Given_Name'])->toBe('MARIOANTONIO')
+        ->and($result['License_or_ID_Number'])->toBe('B66150819');
 });
 
 it('supports canonical only mode', function () {
     $result = DLExtractor::parse('DCSDOE DACJANE DAQ1234', 'pdf417', ['aliases' => false])->toArray();
 
     expect($result)
-        ->toHaveKey('Family_Name', 'DOE')
-        ->toHaveKey('Given_Name', 'JANE')
+        ->toHaveKey('Family_Name')
+        ->toHaveKey('Given_Name')
         ->not->toHaveKey('Last_Name')
-        ->not->toHaveKey('First_Name');
+        ->not->toHaveKey('First_Name')
+        ->and($result['Family_Name'])->toBe('DOE')
+        ->and($result['Given_Name'])->toBe('JANE');
 });
 
 it('throws for unsupported formats', function () {
