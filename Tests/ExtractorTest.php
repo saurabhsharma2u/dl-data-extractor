@@ -1,25 +1,54 @@
 <?php
 
+declare(strict_types=1);
+
 use SaurabhSharma\DLExtractor\DLExtractor;
+use SaurabhSharma\DLExtractor\Exceptions\UnsupportedTransformerException;
 
+it('returns response as array', function () {
+    $result = DLExtractor::parse('DCSDOE DACJANE DAQ1234')->toArray();
 
-it('return response as array', function () {
-    $a = DLExtractor::parse('asd')->toArray();
-    expect($a)->toBeArray();
-})->skip();
-
-it('return response as json string', function () {
-    $a = DLExtractor::parse('asd')->toJson();
-    expect($a)->toBeJson();
-})->skip();
-
-it('can parse actual PDF417 string to array', function () {
-    $a = DLExtractor::parse('@ANSI636000030001DL00310447DLDCADDCBNONEDCDNONEDBA09192025DCSAPARICIOVASQUEZDCTMARIOANTONIODBD11292021DBB09191997DBC1DAYBRODAU072inDAG6903HAMILTONCTDAILORTONDAJVADAK220791213DAQB66150819DCF089686156DCGUSADCHDDDC00000000DDB12102008DDDNDDAFDCK00601017273016	')->toArray();
-    print_r($a);
-    expect($a)->toBeArray();
+    expect($result)->toBeArray()
+        ->toHaveKey('Family_Name')
+        ->toHaveKey('First_Name')
+        ->toHaveKey('License_or_ID_Number')
+        ->and($result['Family_Name'])->toBe('DOE')
+        ->and($result['First_Name'])->toBe('JANE')
+        ->and($result['License_or_ID_Number'])->toBe('1234');
 });
 
-it('can parse actual PDF417 string', function () {
-    $a = DLExtractor::parse('@  ANSI 636014090102DL00410284ZC03250024DLDAQN8046504 DCSSQUIRE DDEN DACKEVIN DDFN DADWAYNE DDGN DCAC DCBNONE DCDNONE DBD07132020 DBB04241963 DBA04242025 DBC1 DAU072 IN DAYBRO DAG4255 DARTMOUTH DR DAIYORBA LINDA DAJCA DAK928860000   DCF07/13/2020542B7/DDFD/25 DCGUSA DAW190 DAZBRO DCK20195N80465040401 DDAF DDB08292017 DDK1 ZCZCABRN ZCBBRN ZCC ZCD')->toJson();
-    expect($a)->toBeJson();
+it('returns response as json string', function () {
+    $result = DLExtractor::parse('DCSDOE DACJANE DAQ1234')->toJson();
+
+    expect($result)->toBeJson();
+});
+
+it('can parse actual PDF417 string to array', function () {
+    $result = DLExtractor::parse('@ANSI636000030001DL00310447DLDCADDCBNONEDCDNONEDBA09192025DCSAPARICIOVASQUEZDCTMARIOANTONIODBD11292021DBB09191997DBC1DAYBRODAU072inDAG6903HAMILTONCTDAILORTONDAJVADAK220791213DAQB66150819DCF089686156DCGUSADCHDDDC00000000DDB12102008DDDNDDAFDCK00601017273016')->toArray();
+
+    expect($result)
+        ->toBeArray()
+        ->toHaveKey('Family_Name')
+        ->toHaveKey('Given_Name')
+        ->toHaveKey('License_or_ID_Number')
+        ->and($result['Family_Name'])->toBe('APARICIOVASQUEZ')
+        ->and($result['Given_Name'])->toBe('MARIOANTONIO')
+        ->and($result['License_or_ID_Number'])->toBe('B66150819');
+});
+
+it('supports canonical only mode', function () {
+    $result = DLExtractor::parse('DCSDOE DACJANE DAQ1234', 'pdf417', ['aliases' => false])->toArray();
+
+    expect($result)
+        ->toHaveKey('Family_Name')
+        ->toHaveKey('First_Name')
+        ->not->toHaveKey('Last_Name')
+        ->not->toHaveKey('Given_Name')
+        ->and($result['Family_Name'])->toBe('DOE')
+        ->and($result['First_Name'])->toBe('JANE');
+});
+
+it('throws for unsupported formats', function () {
+    DLExtractor::parse('DCSDOE', 'mrz');
+})->throws(UnsupportedTransformerException::class);
 })->skip();

@@ -27,14 +27,20 @@
     }
   },
   "require": {
-    "php": "^7.1 || ^7.2 || ^7.3 || ^7.4 || ^8.0 || ^8.1 || ^8.2"
+    "php": "^8.2 || ^8.3"
   },
   "require-dev": {
-    "pestphp/pest": "^1.22"
+    "pestphp/pest": "^3.0",
+    "phpstan/phpstan": "^1.11"
   },
   "config": {
     "allow-plugins": {
       "pestphp/pest-plugin": true
     }
+  },
+  "prefer-stable": true,
+  "scripts": {
+    "test": "vendor/bin/pest",
+    "lint": "vendor/bin/phpstan analyse src --level=1 --no-progress"
   }
 }
