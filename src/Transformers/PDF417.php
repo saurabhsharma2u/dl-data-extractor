@@ -1,47 +1,92 @@
 <?php
 
+declare(strict_types=1);
+
 namespace SaurabhSharma\DLExtractor\Transformers;
 
 use SaurabhSharma\DLExtractor\Attributes\PDF417 as AttributesPDF417;
+use SaurabhSharma\DLExtractor\Contracts\TransformerInterface;
 
-class PDF417 extends AttributesPDF417
+class PDF417 extends AttributesPDF417 implements TransformerInterface
 {
-    public string $pdf417;
-    public function __construct(string $pdf417)
-    {
-        $this->pdf417 = $pdf417;
+    public function __construct(
+        public string $pdf417,
+        private bool $includeAliases = true
+    ) {
     }
+
     public function toJson(): string
     {
-        return json_encode($this->extract($this->pdf417));
+        $json = json_encode($this->extract(), JSON_UNESCAPED_UNICODE);
+
+        return $json === false ? '[]' : $json;
     }
 
+    /**
+     * @return array<string, string>
+     */
     public function toArray(): array
     {
-        return $this->extract($this->pdf417);
+        return $this->extract();
     }
+
+    /**
+     * @return array<string, string>
+     */
     public function extract(): array
     {
-        $pdf417Data = [];
-        foreach ($this->Keys as $key => $item) {
-            $this->pdf417 = str_replace($item['abbreviation'], ' ' . $item['abbreviation'], $this->pdf417);
-        }
-        $dl_string = str_replace('  ', ' ', $this->pdf417);
-        foreach ($this->Keys as $key => $item) {
-            $value = $this->getField(dl_string: $this->pdf417, keyword: $item['abbreviation']);
-            if (!empty(trim($value))) {
-                $pdf417Data[$item['description']]   = $value;
+        $data = [];
+        $canonical = $this->canonicalMap();
+        $aliases = $this->aliasMap();
+
+        foreach ($this->tokenize($this->pdf417) as $code => $value) {
+            if (! isset($canonical[$code]) || $value === '') {
+                continue;
+            }
+
+            $data[$canonical[$code]] = $value;
+
+            if (! $this->includeAliases || ! isset($aliases[$code])) {
+                continue;
+            }
+
+            foreach ($aliases[$code] as $aliasKey) {
+                $data[$aliasKey] = $value;
             }
         }
-        return $pdf417Data;
+
+        return $data;
     }
-    public function getField(string $dl_string, string $keyword): bool|string
+
+    /**
+     * @return array<string, string>
+     */
+    private function tokenize(string $payload): array
     {
-        $k = strpos($dl_string, " " . $keyword);
-        if ($k === false) {
-            return false;
+        $normalized = preg_replace('/[\x00-\x1F\x7F]+/u', ' ', $payload) ?? $payload;
+        $codes = array_keys($this->canonicalMap());
+
+        if ($codes === []) {
+            return [];
         }
-        $m = strpos($dl_string, " ", $k + 1);
-        return substr($dl_string, ($k + 4), ($m - ($k + 4)));
+
+        $pattern = '/(' . implode('|', array_map('preg_quote', $codes)) . ')(.*?)(?=(' . implode('|', array_map('preg_quote', $codes)) . ')|$)/s';
+
+        if (! preg_match_all($pattern, $normalized, $matches, PREG_SET_ORDER)) {
+            return [];
+        }
+
+        $tokens = [];
+
+        foreach ($matches as $match) {
+            $code = $match[1];
+            $value = trim($match[2]);
+
+            if ($value !== '') {
+                $tokens[$code] = $value;
+            }
+        }
+
+        return $tokens;
     }
 }

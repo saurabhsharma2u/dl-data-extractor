@@ -4,7 +4,8 @@ namespace SaurabhSharma\DLExtractor\Attributes;
 
 class PDF417
 {
-    public array $Keys = [
+    /** @var array<int, array{abbreviation:string,description:string}> */
+    protected array $rawKeys = [
         [
             'abbreviation' => 'DAA',
             'description' => 'Full_Name',
@@ -371,4 +372,49 @@ class PDF417
         ],
 
     ];
+
+
+    /**
+     * @return array<string, string>
+     */
+    public function canonicalMap(): array
+    {
+        $map = [];
+
+        foreach ($this->rawKeys as $item) {
+            if (! isset($map[$item['abbreviation']])) {
+                $map[$item['abbreviation']] = $item['description'];
+            }
+        }
+
+        return $map;
+    }
+
+    /**
+     * @return array<string, array<int, string>>
+     */
+    public function aliasMap(): array
+    {
+        $canonical = $this->canonicalMap();
+        $aliases = [];
+
+        foreach ($this->rawKeys as $item) {
+            $abbr = $item['abbreviation'];
+            $description = $item['description'];
+
+            if ($canonical[$abbr] === $description) {
+                continue;
+            }
+
+            if (! isset($aliases[$abbr])) {
+                $aliases[$abbr] = [];
+            }
+
+            if (! in_array($description, $aliases[$abbr], true)) {
+                $aliases[$abbr][] = $description;
+            }
+        }
+
+        return $aliases;
+    }
 }
