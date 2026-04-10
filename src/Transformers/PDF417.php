@@ -64,20 +64,23 @@ class PDF417 extends AttributesPDF417 implements TransformerInterface
     private function tokenize(string $payload): array
     {
         $normalized = preg_replace('/[\x00-\x1F\x7F]+/u', ' ', $payload) ?? $payload;
+        $codes = array_keys($this->canonicalMap());
 
-        if (! preg_match_all('/(?:^|\s)([DPZ][A-Z0-9]{2})/', $normalized, $matches, PREG_OFFSET_CAPTURE)) {
+        if ($codes === []) {
+            return [];
+        }
+
+        $pattern = '/(' . implode('|', array_map('preg_quote', $codes)) . ')(.*?)(?=(' . implode('|', array_map('preg_quote', $codes)) . ')|$)/s';
+
+        if (! preg_match_all($pattern, $normalized, $matches, PREG_SET_ORDER)) {
             return [];
         }
 
         $tokens = [];
-        $count = count($matches[1]);
 
-        for ($index = 0; $index < $count; $index++) {
-            $code = $matches[1][$index][0];
-            $codePosition = $matches[1][$index][1];
-            $valueStart = $codePosition + 3;
-            $valueEnd = $index + 1 < $count ? $matches[1][$index + 1][1] : strlen($normalized);
-            $value = trim(substr($normalized, $valueStart, $valueEnd - $valueStart));
+        foreach ($matches as $match) {
+            $code = $match[1];
+            $value = trim($match[2]);
 
             if ($value !== '') {
                 $tokens[$code] = $value;
